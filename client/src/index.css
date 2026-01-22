@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #f5222d;
+  --text-color: #ffffff;
+  /* White text for dark theme */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #1f1f1f 0%, #2f0000 100%);
+  /* Dark Grey to Deep Red */
+  background-attachment: fixed;
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+/* Glassmorphism Utilities */
+.glass-navbar {
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.glass-panel {
+  background: rgba(30, 30, 30, 0.7);
+  /* Darker semi-transparent background for better text contrast */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  padding: 30px;
+  color: #fff;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 24px;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(245, 34, 45, 0.2);
+  /* Red glow on hover */
+  border-color: rgba(245, 34, 45, 0.3);
+}
+
+/* Typography Overrides for Dark Theme */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.ant-typography,
+.ant-typography strong,
+.ant-typography-edit-content,
+.ant-typography-secondary {
+  color: #ffffff !important;
+}
+
+p,
+span,
+div,
+li {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.ant-typography-secondary {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Ant Design Overrides */
+.ant-dropdown-menu,
+.ant-menu-dark,
+.ant-menu-light,
+/* Force light menu to be dark in this theme */
+.ant-menu:not(.ant-menu-dark) {
+  background: rgba(30, 30, 30, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.ant-dropdown-menu-item,
+.ant-menu-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-dropdown-menu-item:hover,
+.ant-menu-item-selected,
+.ant-menu-item:hover {
+  background: rgba(245, 34, 45, 0.2) !important;
+  /* Red hover tint */
+  color: white !important;
+}
+
+.ant-select-dropdown {
+  background: rgba(30, 30, 30, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ant-select-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-select-item-option-active {
+  background: rgba(245, 34, 45, 0.2) !important;
+}
+
+.ant-modal-content,
+.ant-modal-header {
+  background: #1f1f1f !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ant-modal-title {
+  color: white !important;
+}
+
+.ant-modal-close-x {
+  color: white !important;
+}
+
+.ant-btn-primary {
+  background: #f5222d;
+  border-color: #f5222d;
+  box-shadow: 0 4px 15px rgba(245, 34, 45, 0.4);
+}
+
+.ant-btn-primary:hover {
+  background: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  transform: scale(1.05);
+}
+
+.ant-layout {
+  background: transparent !important;
+}
+
+.ant-layout-header,
+.ant-layout-sider,
+.ant-layout-content {
+  background: transparent !important;
+}
+
+/* Form Styles - Clean Glass Inputs */
+.ant-input-affix-wrapper,
+.ant-input:not(.ant-input-affix-wrapper) {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 12px 20px !important;
+  /* Larger click area */
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+/* Remove internal borders/backgrounds for inputs inside wrappers */
+.ant-input-affix-wrapper>input.ant-input {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Focus State */
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-input:focus {
+  border-color: #f5222d !important;
+  box-shadow: 0 0 0 4px rgba(245, 34, 45, 0.1) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Placeholder */
+.ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Icons inside Input */
+.ant-input-prefix,
+.ant-input-suffix {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Fix for Browser Autofill (White Background Issue) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #2a2a2a inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: white;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500;
+  transition: color 0.3s;
+  font-size: 16px;
+}
+
+/* Message / Toast Overrides */
+.ant-message-notice-content {
+  background: rgba(30, 30, 30, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 8px !important;
+}
+
+.ant-message-custom-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ant-message .anticon {
+  position: relative;
+  top: -1px;
+}
+
+/* Police Theme Sidebar Overrides */
+.police-theme .ant-menu,
+.police-theme .ant-menu-dark,
+.police-theme .ant-layout-sider-children {
+  background: transparent !important;
+}
+
+.police-theme .ant-menu-item-selected {
+  background: #1890ff !important;
+  /* Blue background for selected */
+  color: white !important;
+}
+
+.police-theme .ant-menu-item:hover {
+  background: rgba(24, 144, 255, 0.2) !important;
+  /* Blue hover tint */
+  color: white !important;
+}
+
+.police-theme .ant-layout-sider {
+  border-right: 1px solid rgba(24, 144, 255, 0.1) !important;
+}
