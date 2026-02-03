@@ -15,9 +15,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'police'],
+    enum: ['admin', 'police', 'citizen'],
     default: 'admin',
   },
+  isPatrol: {
+    type: Boolean,
+    default: false
+  }
 }, { timestamps: true });
 
 // Hash password before saving

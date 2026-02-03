@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, message } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -14,6 +14,7 @@ import {
     ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -21,12 +22,32 @@ const { Title } = Typography;
 const AdminDashboard = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState('1');
+    const [reports, setReports] = useState([]);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Get user info from localStorage
-    // Get user info from localStorage
+    // User is guaranteed to be admin here
     const user = JSON.parse(localStorage.getItem('user')) || { role: 'admin', email: 'Admin' };
     const displayRole = 'Administrator';
+
+    useEffect(() => {
+        fetchReports();
+    }, []);
+
+    const fetchReports = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosInstance.get('/reports');
+            if (res.data.success) {
+                setReports(res.data.data);
+            }
+        } catch (error) {
+            console.error(error);
+            message.error('Failed to fetch reports');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -43,13 +64,72 @@ const AdminDashboard = () => {
         },
     ];
 
-    const handleMenuClick = ({ key }) => {
-        setSelectedKey(key);
-    };
+    const menuItems = [
+        {
+            key: '1',
+            icon: <DashboardOutlined />,
+            label: 'Dashboard',
+        },
+        {
+            key: '2',
+            icon: <FileTextOutlined />,
+            label: 'Accident Reports',
+        },
+        {
+            key: '3',
+            icon: <CarOutlined />,
+            label: 'Vehicle History',
+        },
+    ];
+
+    // Table Columns for Reports
+    const columns = [
+        {
+            title: 'Severity',
+            dataIndex: 'severity',
+            key: 'severity',
+            render: (text) => {
+                let color = 'green';
+                if (text === 'Major') color = 'gold';
+                if (text === 'Critical') color = 'red';
+                return <Tag color={color}>{text.toUpperCase()}</Tag>;
+            },
+        },
+        {
+            title: 'Location',
+            dataIndex: 'location',
+            key: 'location',
+        },
+        {
+            title: 'Vehicle No',
+            dataIndex: 'vehicleNo',
+            key: 'vehicleNo',
+            render: (text) => text || 'N/A',
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+            ellipsis: true,
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text) => <Tag color={text === 'Pending' ? 'orange' : 'blue'}>{text}</Tag>,
+        },
+        {
+            title: 'Time',
+            dataIndex: 'timestamp',
+            key: 'timestamp',
+            render: (text) => new Date(text).toLocaleString(),
+        },
+    ];
 
     const renderContent = () => {
         switch (selectedKey) {
             case '1':
+                // Overview
                 return (
                     <div className="glass-panel">
                         <Title level={4} style={{ marginBottom: '20px' }}>Overview</Title>
@@ -59,14 +139,16 @@ const AdminDashboard = () => {
                             <Col xs={24} sm={12} lg={6}>
                                 <div className="glass-card" style={{ textAlign: 'center' }}>
                                     <FileTextOutlined style={{ fontSize: '32px', color: '#f5222d', marginBottom: '10px' }} />
-                                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>1,240</div>
+                                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>{reports.length}</div>
                                     <div style={{ color: 'rgba(255,255,255,0.7)' }}>Total Reports</div>
                                 </div>
                             </Col>
                             <Col xs={24} sm={12} lg={6}>
                                 <div className="glass-card" style={{ textAlign: 'center' }}>
                                     <AlertOutlined style={{ fontSize: '32px', color: '#faad14', marginBottom: '10px' }} />
-                                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>45</div>
+                                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>
+                                        {reports.filter(r => r.status === 'Pending').length}
+                                    </div>
                                     <div style={{ color: 'rgba(255,255,255,0.7)' }}>Pending Verification</div>
                                 </div>
                             </Col>
@@ -85,17 +167,36 @@ const AdminDashboard = () => {
                                 </div>
                             </Col>
                         </Row>
+
+                        <div style={{ marginTop: '40px' }}>
+                            <Title level={4}>Recent Reports</Title>
+                            <Table
+                                dataSource={reports.slice(0, 5)}
+                                columns={columns}
+                                rowKey="_id"
+                                pagination={false}
+                                className="glass-table"
+                            />
+                        </div>
                     </div>
                 );
             case '2':
+                // Accident Reports
                 return (
-                    <div className="glass-panel" style={{ textAlign: 'center', padding: '100px 20px' }}>
-                        <FileTextOutlined style={{ fontSize: '64px', color: '#f5222d', marginBottom: '20px' }} />
-                        <Title level={2}>Accident Reports</Title>
-                        <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.7)' }}>This feature is under development.</p>
-                        <div style={{ marginTop: '20px', padding: '10px 20px', background: 'rgba(245, 34, 45, 0.1)', display: 'inline-block', borderRadius: '8px', color: '#f5222d', fontWeight: 'bold' }}>
-                            COMING SOON
+                    <div className="glass-panel">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <Title level={4}>All Accident Reports</Title>
+                            <Button icon={<ClockCircleOutlined />} onClick={fetchReports} loading={loading}>
+                                Refresh Data
+                            </Button>
                         </div>
+
+                        <Table
+                            dataSource={reports}
+                            columns={columns}
+                            rowKey="_id"
+                            loading={loading}
+                        />
                     </div>
                 );
             case '3':
@@ -125,25 +226,9 @@ const AdminDashboard = () => {
                     mode="inline"
                     defaultSelectedKeys={['1']}
                     selectedKeys={[selectedKey]}
-                    onClick={handleMenuClick}
+                    onClick={(e) => setSelectedKey(e.key)}
                     style={{ background: 'transparent' }}
-                    items={[
-                        {
-                            key: '1',
-                            icon: <DashboardOutlined />,
-                            label: 'Dashboard',
-                        },
-                        {
-                            key: '2',
-                            icon: <FileTextOutlined />,
-                            label: 'Accident Reports',
-                        },
-                        {
-                            key: '3',
-                            icon: <CarOutlined />,
-                            label: 'Vehicle History',
-                        },
-                    ]}
+                    items={menuItems}
                 />
             </Sider>
             <Layout className="site-layout" style={{ background: 'transparent' }}>
