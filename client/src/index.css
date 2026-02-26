@@ -269,10 +269,24 @@ li {
     background: rgba(0, 0, 0, 0.25) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 12px !important;
-    padding: 12px 20px !important;
-    /* Larger click area */
+    padding-inline: 20px !important;
+    height: 50px !important;
     color: white !important;
     transition: all 0.3s ease;
+}
+
+.ant-input-password-icon,
+.ant-input-password-icon.anticon {
+    color: rgba(255, 255, 255, 0.85) !important;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 18px;
+    opacity: 1 !important;
+}
+
+.ant-input-password-icon:hover,
+.ant-input-password-icon.anticon:hover {
+    color: white !important;
 }
 
 /* Remove internal borders/backgrounds for inputs inside wrappers */
@@ -298,7 +312,11 @@ li {
 }
 
 /* Icons inside Input */
-.ant-input-prefix,
+.ant-input-prefix {
+    color: rgba(255, 255, 255, 0.5) !important;
+    margin-right: 12px !important;
+}
+
 .ant-input-suffix {
     color: rgba(255, 255, 255, 0.5) !important;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, message } from 'antd';
+import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, message, App } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -14,12 +14,12 @@ import {
     ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/axiosInstance';
+import { formatDisplayName } from '../utils/userUtils';
 
 const { Header, Sider, Content } = Layout;
-const { Title } = Typography;
 
 const AdminDashboard = () => {
+    const { modal } = App.useApp();
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState('1');
     const [reports, setReports] = useState([]);
@@ -50,9 +50,18 @@ const AdminDashboard = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+        modal.confirm({
+            title: 'Logout Confirmation',
+            content: 'Are you sure you want to logout?',
+            okText: 'Yes, Logout',
+            cancelText: 'Cancel',
+            okButtonProps: { danger: true },
+            onOk: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+            },
+        });
     };
 
     const userItems = [
@@ -242,7 +251,7 @@ const AdminDashboard = () => {
                     <Dropdown menu={{ items: userItems }} placement="bottomRight">
                         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }}>
                             <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#f5222d' }} />
-                            <span style={{ fontWeight: 500, color: '#fff' }}>{displayRole}</span>
+                            <span style={{ fontWeight: 500, color: '#fff' }}>{formatDisplayName(user)}</span>
                         </div>
                     </Dropdown>
                 </Header>

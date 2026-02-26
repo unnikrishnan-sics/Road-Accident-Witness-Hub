@@ -17,10 +17,12 @@ import axiosInstance from '../api/axiosInstance';
 import AccidentMap from '../components/AccidentMap';
 import { io } from 'socket.io-client';
 
+import { formatDisplayName } from '../utils/userUtils';
+
 const { Title, Text } = Typography;
 
 const ReporterDashboard = () => {
-    const { message } = App.useApp();
+    const { message, modal } = App.useApp();
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState('1');
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
@@ -60,9 +62,18 @@ const ReporterDashboard = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+        modal.confirm({
+            title: 'Logout Confirmation',
+            content: 'Are you sure you want to logout?',
+            okText: 'Yes, Logout',
+            cancelText: 'Cancel',
+            okButtonProps: { danger: true },
+            onOk: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+            },
+        });
     };
 
     const userItems = [
@@ -242,7 +253,7 @@ const ReporterDashboard = () => {
                 return (
                     <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px' }}>
                         <Avatar size={100} icon={<UserOutlined />} style={{ backgroundColor: '#f5222d', marginBottom: '20px' }} />
-                        <Title level={3}>{user.email}</Title>
+                        <Title level={3}>{formatDisplayName(user)}</Title>
                         <Tag style={{
                             color: 'black',
                             backgroundColor: '#13c2c2',
@@ -298,7 +309,7 @@ const ReporterDashboard = () => {
                     <Dropdown menu={{ items: userItems }} placement="bottomRight">
                         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }}>
                             <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-                            <span style={{ fontWeight: 500, color: '#fff' }}>{user.email?.split('@')[0]}</span>
+                            <span style={{ fontWeight: 500, color: '#fff' }}>{formatDisplayName(user)}</span>
                         </div>
                     </Dropdown>
                 </Layout.Header>

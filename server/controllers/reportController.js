@@ -35,6 +35,13 @@ exports.createReport = async (req, res) => {
             console.log(`[Upload] Image saved to ${filepath}, URL: ${photoUrl}`);
         }
 
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                success: false,
+                error: 'Authentication failed. Please login again.'
+            });
+        }
+
         const report = await Report.create({
             location,
             description,
@@ -57,9 +64,23 @@ exports.createReport = async (req, res) => {
         });
     } catch (error) {
         console.error('Create Report Error:', error);
+
+        // Handle Mongoose Validation Errors specifically
+        if (error.name === 'ValidationError') {
+            const errors = {};
+            Object.keys(error.errors).forEach(key => {
+                errors[key] = error.errors[key].message;
+            });
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                errors
+            });
+        }
+
         res.status(500).json({
             success: false,
-            error: 'Server Error'
+            error: error.message || 'Server Error'
         });
     }
 };

@@ -27,7 +27,14 @@ const Contact = () => {
                         onFinish={onFinish}
                         size="large"
                     >
-                        <Form.Item name="name" label={<span style={{ color: 'white' }}>Name</span>} rules={[{ required: true }]}>
+                        <Form.Item
+                            name="name"
+                            label={<span style={{ color: 'white' }}>Name</span>}
+                            rules={[
+                                { required: true, message: 'Please enter your name' },
+                                { pattern: /^[A-Za-z\s]+$/, message: 'Name can only contain letters and spaces' }
+                            ]}
+                        >
                             <Input placeholder="Your Name" />
                         </Form.Item>
                         <Form.Item name="email" label={<span style={{ color: 'white' }}>Email</span>} rules={[{ required: true, type: 'email' }]}>

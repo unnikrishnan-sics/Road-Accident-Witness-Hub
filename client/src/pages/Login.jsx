@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Typography, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import Navbar from '../components/Navbar';
@@ -53,7 +53,7 @@ const Login = () => {
                             name="email"
                             rules={[{ required: true, message: 'Please input your Email!' }, { type: 'email', message: 'Invalid email format' }]}
                         >
-                            <Input prefix={<UserOutlined style={{ color: 'rgba(255,255,255,0.5)' }} />} placeholder="Email" />
+                            <Input prefix={<MailOutlined style={{ color: 'rgba(255,255,255,0.5)' }} />} placeholder="Email" />
                         </Form.Item>
 
                         <Form.Item

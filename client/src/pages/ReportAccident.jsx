@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Upload, Select, Typography, Card, App } from 'antd';
-import { UploadOutlined, EnvironmentOutlined, CarOutlined, AlertOutlined } from '@ant-design/icons';
+import { UploadOutlined, EnvironmentOutlined, CarOutlined, AlertOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import ReporterLayout from '../components/ReporterLayout';
@@ -28,6 +28,10 @@ const ReportAccident = () => {
             navigate('/login');
         }
     }, [navigate, message]);
+
+    const handleCancel = () => {
+        navigate('/reporter/dashboard');
+    };
 
     const handleImageAnalysis = async (file) => {
         setAnalysisLoading(true);
@@ -165,7 +169,20 @@ const ReportAccident = () => {
 
         } catch (error) {
             console.error(error);
-            message.error('Failed to submit report. Please try again.');
+            const data = error.response?.data;
+
+            if (data?.errors) {
+                // Map structured server errors to Ant Design form fields
+                const formErrors = Object.keys(data.errors).map(field => ({
+                    name: field,
+                    errors: [data.errors[field]]
+                }));
+                form.setFields(formErrors);
+                message.error('Please correct the highlighted fields.');
+            } else {
+                const errorMsg = data?.error || 'Failed to submit report. Please try again.';
+                message.error(errorMsg);
+            }
         } finally {
             setLoading(false);
         }
@@ -180,7 +197,13 @@ const ReportAccident = () => {
                 minHeight: '80vh' // adjust to fit within content area
             }}>
                 <Card className="glass-panel" style={{ width: '100%', maxWidth: '600px', borderTop: '4px solid #f5222d' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '30px', position: 'relative' }}>
+                        <Button
+                            type="text"
+                            icon={<ArrowLeftOutlined />}
+                            onClick={handleCancel}
+                            style={{ position: 'absolute', left: 0, top: 0, color: 'white' }}
+                        />
                         <AlertOutlined style={{ fontSize: '48px', color: '#f5222d', marginBottom: '10px' }} />
                         <Title level={2} style={{ margin: 0 }}>Report Accident</Title>
                         <Text type="secondary" style={{ color: 'rgba(255,255,255,0.7)' }}>
@@ -282,23 +305,41 @@ const ReportAccident = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                block
-                                size="large"
-                                loading={loading}
-                                style={{
-                                    height: '50px',
-                                    fontSize: '18px',
-                                    fontWeight: 'bold',
-                                    background: '#f5222d',
-                                    borderColor: '#f5222d',
-                                    marginTop: '10px'
-                                }}
-                            >
-                                SUBMIT REPORT
-                            </Button>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <Button
+                                    size="large"
+                                    onClick={handleCancel}
+                                    style={{
+                                        flex: 1,
+                                        height: '50px',
+                                        fontSize: '18px',
+                                        fontWeight: 'bold',
+                                        background: 'transparent',
+                                        borderColor: 'rgba(255,255,255,0.3)',
+                                        color: 'white',
+                                        marginTop: '10px'
+                                    }}
+                                >
+                                    CANCEL
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="large"
+                                    loading={loading}
+                                    style={{
+                                        flex: 2,
+                                        height: '50px',
+                                        fontSize: '18px',
+                                        fontWeight: 'bold',
+                                        background: '#f5222d',
+                                        borderColor: '#f5222d',
+                                        marginTop: '10px'
+                                    }}
+                                >
+                                    SUBMIT REPORT
+                                </Button>
+                            </div>
                         </Form.Item>
                     </Form>
                 </Card>

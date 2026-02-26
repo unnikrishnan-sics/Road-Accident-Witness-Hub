@@ -20,7 +20,7 @@ const reportSchema = new mongoose.Schema({
     },
     vehicleNo: {
         type: String,
-        required: true
+        required: false
     },
     severity: {
         type: String,

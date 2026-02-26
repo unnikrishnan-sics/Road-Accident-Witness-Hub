@@ -10,8 +10,9 @@ const generateToken = (id) => {
 // @desc    Register a new user (Citizen)
 // @route   POST /api/auth/register
 // @access  Public
+
 exports.registerUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -23,7 +24,7 @@ exports.registerUser = async (req, res) => {
         const user = await User.create({
             email,
             password,
-
+            name,
             role: 'citizen', // Default to citizen
         });
 
@@ -31,6 +32,7 @@ exports.registerUser = async (req, res) => {
             res.status(201).json({
                 _id: user._id,
                 email: user.email,
+                name: user.name,
                 role: user.role,
                 token: generateToken(user._id),
             });
@@ -55,6 +57,7 @@ exports.loginAdmin = async (req, res) => {
             res.json({
                 _id: user._id,
                 email: user.email,
+                name: user.name,
                 role: user.role,
                 token: generateToken(user._id),
             });
@@ -77,6 +80,7 @@ exports.getMe = async (req, res) => {
             res.json({
                 _id: user._id,
                 email: user.email,
+                name: user.name,
                 role: user.role,
                 isPatrol: user.isPatrol
             });

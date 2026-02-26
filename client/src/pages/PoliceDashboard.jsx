@@ -19,10 +19,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import AccidentMap from '../components/AccidentMap';
-import { io } from 'socket.io-client';
+import { formatDisplayName } from '../utils/userUtils';
 
 const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
 
 const PoliceDashboard = () => {
     const { message, modal, notification } = App.useApp();
@@ -224,9 +223,18 @@ const PoliceDashboard = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+        modal.confirm({
+            title: 'Logout Confirmation',
+            content: 'Are you sure you want to logout?',
+            okText: 'Yes, Logout',
+            cancelText: 'Cancel',
+            okButtonProps: { danger: true },
+            onOk: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+            },
+        });
     };
 
     const userItems = [
@@ -549,7 +557,7 @@ const PoliceDashboard = () => {
                     <Dropdown menu={{ items: userItems }} placement="bottomRight">
                         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }}>
                             <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-                            <span style={{ fontWeight: 500, color: '#fff' }}>{displayRole}</span>
+                            <span style={{ fontWeight: 500, color: '#fff' }}>{formatDisplayName(user)}</span>
                         </div>
                     </Dropdown>
                 </Header>

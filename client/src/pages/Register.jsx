@@ -14,11 +14,9 @@ const Register = () => {
     const onFinish = async (values) => {
         setLoading(true);
         try {
-            const { data } = await axiosInstance.post('/auth/register', values);
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data));
-            message.success('Registration successful! Welcome.');
-            navigate('/reporter/dashboard'); // Redirect citizens to dashboard
+            await axiosInstance.post('/auth/register', values);
+            message.success('Registration successful! Please login to continue.');
+            navigate('/login');
         } catch (error) {
             message.error(error.response?.data?.message || 'Registration failed');
         } finally {
@@ -42,6 +40,13 @@ const Register = () => {
                         layout="vertical"
                         size="large"
                     >
+                        <Form.Item
+                            name="name"
+                            rules={[{ required: true, message: 'Please input your Full Name!' }]}
+                        >
+                            <Input prefix={<UserOutlined style={{ color: 'rgba(255,255,255,0.5)' }} />} placeholder="Full Name" />
+                        </Form.Item>
+
                         <Form.Item
                             name="email"
                             rules={[{ required: true, message: 'Please input your Email!' }, { type: 'email', message: 'Invalid email format' }]}

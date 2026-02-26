@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Typography } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, Typography, App } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -10,9 +10,12 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+import { formatDisplayName } from '../utils/userUtils';
+
 const { Header, Sider, Content } = Layout;
 
 const ReporterLayout = ({ children }) => {
+    const { modal } = App.useApp();
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -21,9 +24,18 @@ const ReporterLayout = ({ children }) => {
     const user = JSON.parse(localStorage.getItem('user')) || { email: 'Reporter' };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+        modal.confirm({
+            title: 'Logout Confirmation',
+            content: 'Are you sure you want to logout?',
+            okText: 'Yes, Logout',
+            cancelText: 'Cancel',
+            okButtonProps: { danger: true },
+            onOk: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+            },
+        });
     };
 
     const userItems = [
@@ -85,7 +97,7 @@ const ReporterLayout = ({ children }) => {
                     <Dropdown menu={{ items: userItems }} placement="bottomRight">
                         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }}>
                             <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-                            <span style={{ fontWeight: 500, color: '#fff' }}>{user.email?.split('@')[0]}</span>
+                            <span style={{ fontWeight: 500, color: '#fff' }}>{formatDisplayName(user)}</span>
                         </div>
                     </Dropdown>
                 </Header>
