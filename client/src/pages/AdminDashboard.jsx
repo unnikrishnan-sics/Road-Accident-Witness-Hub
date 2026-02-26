@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, message, App } from 'antd';
+import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, App } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -15,11 +14,14 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { formatDisplayName } from '../utils/userUtils';
+import axiosInstance from '../api/axiosInstance';
+import React,{ useEffect, useState } from 'react';
 
 const { Header, Sider, Content } = Layout;
+const { Title, Text } = Typography;
 
 const AdminDashboard = () => {
-    const { modal } = App.useApp();
+    const { modal, message } = App.useApp();
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState('1');
     const [reports, setReports] = useState([]);
