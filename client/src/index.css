@@ -384,7 +384,12 @@ input:-webkit-autofill:active {
 }
 
 /* Glass Table Overrides */
-.glass-table .ant-table {
+.glass-table .ant-table,
+.glass-table .ant-table-container,
+.glass-table .ant-table-content,
+.glass-table .ant-table-thead,
+.glass-table .ant-table-tbody,
+.glass-table .ant-table-placeholder {
     background: transparent !important;
 }
 
@@ -397,6 +402,7 @@ input:-webkit-autofill:active {
 .glass-table .ant-table-tbody>tr>td {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: rgba(255, 255, 255, 0.9) !important;
+    background: transparent !important;
 }
 
 .glass-table .ant-table-tbody>tr:hover>td {

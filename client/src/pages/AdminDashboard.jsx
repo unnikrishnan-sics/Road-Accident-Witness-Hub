@@ -15,7 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { formatDisplayName } from '../utils/userUtils';
 import axiosInstance from '../api/axiosInstance';
-import React,{ useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -207,6 +207,7 @@ const AdminDashboard = () => {
                             columns={columns}
                             rowKey="_id"
                             loading={loading}
+                            className="glass-table"
                         />
                     </div>
                 );

@@ -56,8 +56,19 @@ function App() {
                         titleColor: 'white',
                         contentColor: 'white',
                         colorText: 'white',
-                        colorIcon: 'white',
                         colorIconHover: '#f5222d',
+                    },
+                    Table: {
+                        colorBgContainer: 'transparent',
+                        colorHeaderBg: 'rgba(0, 0, 0, 0.4)',
+                        colorText: 'white',
+                        colorTextHeading: 'white',
+                        colorBorderSecondary: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    Card: {
+                        colorBgContainer: 'rgba(255, 255, 255, 0.03)',
+                        colorBorderSecondary: 'rgba(255, 255, 255, 0.1)',
+                        colorTextHeading: 'white',
                     }
                 }
             }}
