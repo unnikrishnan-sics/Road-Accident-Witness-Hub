@@ -42,7 +42,8 @@ const ReportAccident = () => {
             message.loading({ content: 'AI Analysis in progress...', key: 'ocr' });
 
             const res = await axiosInstance.post('/reports/analyze', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 60000 // Specific longer timeout for AI analysis
             });
 
             if (res.data.success && res.data.data) {

@@ -25,6 +25,7 @@ const io = new Server(server, {
 });
 
 // Store active police locations: { socketId: { userId, lat, lng, timestamp } }
+// Store active police locations: { socketId: { userId, lat, lng, timestamp } }
 // let activePatrols = {};
 const activePatrols = {}; // Empty object to avoid errors
 
