@@ -249,8 +249,12 @@ const PoliceDashboard = () => {
     ];
 
     // Data filtering
+    const today = new Date().toDateString();
     const pendingReports = reports.filter(r => r.status === 'Pending');
-    const resolvedReports = reports.filter(r => r.status === 'Verified' || r.status === 'False');
+    const resolvedReports = reports.filter(r =>
+        (r.status === 'Verified' || r.status === 'False') &&
+        new Date(r.timestamp).toDateString() === today
+    );
     const assignments = reports;
 
     // Reusable Columns
@@ -476,7 +480,7 @@ const PoliceDashboard = () => {
                         />
                     </div>
                 );
-            case '3':
+            /* case '3':
                 return (
                     <div className="glass-panel">
                         <Title level={2}>Vehicle Lookup</Title>
@@ -524,7 +528,7 @@ const PoliceDashboard = () => {
                             </div>
                         )}
                     </div>
-                );
+                ); */
             default:
                 return null;
         }
@@ -545,7 +549,7 @@ const PoliceDashboard = () => {
                     items={[
                         { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
                         { key: '2', icon: <FileTextOutlined />, label: 'Assignments' },
-                        { key: '3', icon: <HistoryOutlined />, label: 'Vehicle Lookup' },
+                        // { key: '3', icon: <HistoryOutlined />, label: 'Vehicle Lookup' },
                     ]}
                 />
             </Sider>
