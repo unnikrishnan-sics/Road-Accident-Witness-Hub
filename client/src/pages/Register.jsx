@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Typography, message } from 'antd';
+import { Form, Input, Button, Typography, App } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar';
 const { Title } = Typography;
 
 const Register = () => {
+    const { message } = App.useApp();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 

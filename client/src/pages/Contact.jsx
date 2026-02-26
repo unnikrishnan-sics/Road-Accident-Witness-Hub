@@ -1,11 +1,12 @@
 import React from 'react';
-import { Typography, Card, Form, Input, Button, message } from 'antd';
+import { Typography, Card, Form, Input, Button, App } from 'antd';
 import Navbar from '../components/Navbar';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const Contact = () => {
+    const { message } = App.useApp();
     const onFinish = (values) => {
         message.success('Thank you for contacting us! We will get back to you shortly.');
         console.log('Success:', values);

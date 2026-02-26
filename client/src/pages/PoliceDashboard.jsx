@@ -19,9 +19,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import AccidentMap from '../components/AccidentMap';
+import { io } from 'socket.io-client';
 import { formatDisplayName } from '../utils/userUtils';
 
 const { Header, Sider, Content } = Layout;
+const { Title, Text } = Typography;
 
 const PoliceDashboard = () => {
     const { message, modal, notification } = App.useApp();
