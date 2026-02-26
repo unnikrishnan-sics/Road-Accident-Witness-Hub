@@ -44,7 +44,7 @@ const Navbar = () => {
             <div className="nav-links" style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
                 {[
                     { name: 'Home', path: '/' },
-                    { name: 'Safety Map', path: '/safety-map' },
+                    // { name: 'Safety Map', path: '/safety-map' },
                     { name: 'About', path: '/about' },
                     { name: 'Contact', path: '/contact' },
                 ].map((link) => (

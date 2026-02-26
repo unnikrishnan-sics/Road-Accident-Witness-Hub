@@ -39,9 +39,9 @@ const ReporterDashboard = () => {
 
         // Socket for live patrols
         const socket = io('http://localhost:5001');
-        socket.on('patrol_update', (patrols) => {
+        /* socket.on('patrol_update', (patrols) => {
             setPolicePatrols(patrols);
-        });
+        }); */
 
         return () => socket.disconnect();
     }, []);

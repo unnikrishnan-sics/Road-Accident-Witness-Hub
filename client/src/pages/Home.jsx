@@ -96,7 +96,7 @@ const Home = () => {
                         >
                             <CameraOutlined /> REPORT INCIDENT
                         </Button>
-                        <Button
+                        {/* <Button
                             size="large"
                             className="glass-btn"
                             style={{
@@ -115,7 +115,7 @@ const Home = () => {
                             onClick={() => navigate('/safety-map')}
                         >
                             <SafetyCertificateOutlined style={{ color: '#1890ff' }} /> VIEW SAFETY MAP
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
 
@@ -159,12 +159,12 @@ const Home = () => {
                                 desc: "Report anonymously with end-to-end data obfuscation. Your safety is our priority.",
                                 color: "#722ed1"
                             },
-                            {
+                            /* {
                                 icon: <SafetyCertificateOutlined />,
                                 title: "Real-time Tracking",
                                 desc: "See where the police are patrolling live on our integrated safety map.",
                                 color: "#1890ff"
-                            }
+                            } */
                         ].map((feature, i) => (
                             <Col xs={24} md={8} key={i}>
                                 <Card className="glass-card" style={{ height: '100%', border: 'none', background: 'rgba(255,255,255,0.02)' }}>

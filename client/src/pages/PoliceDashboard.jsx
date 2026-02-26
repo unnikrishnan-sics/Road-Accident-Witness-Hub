@@ -30,7 +30,8 @@ const PoliceDashboard = () => {
     const [selectedKey, setSelectedKey] = useState('1');
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [isPatrol, setIsPatrol] = useState(false);
+    // const [isPatrol, setIsPatrol] = useState(false);
+    const isPatrol = false; // Force disabled
 
     // Vehicle LookUp State
     const [vehicleSearch, setVehicleSearch] = useState('');
@@ -85,7 +86,7 @@ const PoliceDashboard = () => {
     }, []);
 
     // Live Location Tracking for Patrol
-    useEffect(() => {
+    /* useEffect(() => {
         let watchId = null;
 
         if (isPatrol && socket) {
@@ -109,7 +110,7 @@ const PoliceDashboard = () => {
         return () => {
             if (watchId) navigator.geolocation.clearWatch(watchId);
         };
-    }, [isPatrol, socket]);
+    }, [isPatrol, socket]); */
 
     useEffect(() => {
         const originalBackground = document.body.style.background;
@@ -122,13 +123,12 @@ const PoliceDashboard = () => {
 
     useEffect(() => {
         fetchAllReports();
-        fetchPatrolStatus();
+        // fetchPatrolStatus();
     }, []);
 
-    const fetchPatrolStatus = async () => {
+    /* const fetchPatrolStatus = async () => {
         try {
             const res = await axiosInstance.get('/auth/me');
-            // Backend returns user object directly: { _id, email, isPatrol, ... }
             if (res.data) {
                 console.log("[Frontend] Fetched Patrol Status:", res.data.isPatrol);
                 setIsPatrol(!!res.data.isPatrol);
@@ -136,7 +136,7 @@ const PoliceDashboard = () => {
         } catch (error) {
             console.error("Failed to fetch patrol status", error);
         }
-    };
+    }; */
 
     const fetchAllReports = async () => {
         setLoading(true);
@@ -166,7 +166,7 @@ const PoliceDashboard = () => {
         }
     };
 
-    const togglePatrol = async (checked) => {
+    /* const togglePatrol = async (checked) => {
         try {
             const res = await axiosInstance.put('/auth/patrol', { isPatrol: checked });
             if (res.data.success) {
@@ -181,7 +181,7 @@ const PoliceDashboard = () => {
             console.error(error);
             message.error('Failed to update patrol status');
         }
-    };
+    }; */
 
     const handleRowClick = (record) => {
         setSelectedReport(record);
@@ -380,7 +380,7 @@ const PoliceDashboard = () => {
                                     />
                                 </Card>
                             </Col>
-                            <Col xs={24} sm={8}>
+                            {/* <Col xs={24} sm={8}>
                                 <Card variant="borderless" className="glass-card" styles={{ body: { display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' } }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                                         <Statistic
@@ -402,7 +402,7 @@ const PoliceDashboard = () => {
                                         />
                                     </div>
                                 </Card>
-                            </Col>
+                            </Col> */}
                         </Row>
 
                         <div style={{ marginTop: '40px' }}>

@@ -25,13 +25,14 @@ const io = new Server(server, {
 });
 
 // Store active police locations: { socketId: { userId, lat, lng, timestamp } }
-let activePatrols = {};
+// let activePatrols = {};
+const activePatrols = {}; // Empty object to avoid errors
 
 io.on('connection', (socket) => {
     console.log(`[Socket] New client connected: ${socket.id}`);
 
     // Police sending location updates
-    socket.on('update_location', (data) => {
+    /* socket.on('update_location', (data) => {
         // data expects: { userId, lat, lng }
         console.log(`[Socket] Received location from ${data.userId}: ${data.lat}, ${data.lng}`);
         activePatrols[socket.id] = {
@@ -45,7 +46,7 @@ io.on('connection', (socket) => {
     // Police stopping patrol
     socket.on('stop_patrol', () => {
         delete activePatrols[socket.id];
-    });
+    }); */
 
     socket.on('disconnect', () => {
         console.log('[Socket] Client disconnected');
@@ -54,11 +55,11 @@ io.on('connection', (socket) => {
 });
 
 // Broadcast active patrols every 2 seconds
-setInterval(() => {
+/* setInterval(() => {
     const patrols = Object.values(activePatrols);
     // Broadcast even if empty so clients clear inactive markers
     io.emit('patrol_update', patrols);
-}, 2000);
+}, 2000); */
 
 // Make io accessible globally or pass it via middleware/export
 // Ideally, we pass it via middleware
