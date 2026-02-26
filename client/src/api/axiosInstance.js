@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create an Axios instance
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api', // Use env var with fallback
-    timeout: 30000,
+    timeout: 60000,
     headers: {
         'Content-Type': 'application/json',
     }
@@ -24,3 +24,12 @@ axiosInstance.interceptors.request.use(
 );
 
 export default axiosInstance;
+
+// Example of how to use the specific AI timeout (this part is illustrative and not added to the axiosInstance config directly)
+// async function analyzeReport(formData) {
+//     const res = await axiosInstance.post('/reports/analyze', formData, {
+//         headers: { 'Content-Type': 'multipart/form-data' },
+//         timeout: 120000 // Increased to 2 minutes for AI analysis
+//     });
+//     return res.data;
+// }
