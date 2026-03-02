@@ -96,7 +96,7 @@ const Home = () => {
                         >
                             <CameraOutlined /> REPORT INCIDENT
                         </Button>
-                        {/* <Button
+                        <Button
                             size="large"
                             className="glass-btn"
                             style={{
@@ -115,7 +115,7 @@ const Home = () => {
                             onClick={() => navigate('/safety-map')}
                         >
                             <SafetyCertificateOutlined style={{ color: '#1890ff' }} /> VIEW SAFETY MAP
-                        </Button> */}
+                        </Button>
                     </div>
                 </div>
 

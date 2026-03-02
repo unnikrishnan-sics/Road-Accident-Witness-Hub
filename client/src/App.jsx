@@ -83,7 +83,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/report" element={<ReportAccident />} />
-                        {/* <Route path="/safety-map" element={<SafetyMap />} /> */}
+                        <Route path="/safety-map" element={<SafetyMap />} />
 
                         {/* Protected Routes */}
                         <Route

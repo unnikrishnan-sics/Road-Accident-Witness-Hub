@@ -57,7 +57,7 @@ const AccidentMap = ({ reports, policePatrols = [] }) => {
             ))}
 
             {/* Police Patrol Markers (Blue) */}
-            {/* {policePatrols.map((patrol, idx) => (
+            {policePatrols.map((patrol, idx) => (
                 <Marker
                     key={`patrol-${patrol.userId}-${idx}`}
                     position={[patrol.lat, patrol.lng]}
@@ -71,7 +71,7 @@ const AccidentMap = ({ reports, policePatrols = [] }) => {
                         </div>
                     </Popup>
                 </Marker>
-            ))} */}
+            ))}
         </MapContainer>
     );
 };

@@ -88,7 +88,7 @@ const PoliceDashboard = () => {
     }, []);
 
     // Live Location Tracking for Patrol
-    /* useEffect(() => {
+    useEffect(() => {
         let watchId = null;
 
         if (isPatrol && socket) {
@@ -112,7 +112,7 @@ const PoliceDashboard = () => {
         return () => {
             if (watchId) navigator.geolocation.clearWatch(watchId);
         };
-    }, [isPatrol, socket]); */
+    }, [isPatrol, socket]);
 
     useEffect(() => {
         const originalBackground = document.body.style.background;
@@ -125,10 +125,10 @@ const PoliceDashboard = () => {
 
     useEffect(() => {
         fetchAllReports();
-        // fetchPatrolStatus();
+        fetchPatrolStatus();
     }, []);
 
-    /* const fetchPatrolStatus = async () => {
+    const fetchPatrolStatus = async () => {
         try {
             const res = await axiosInstance.get('/auth/me');
             if (res.data) {
@@ -138,7 +138,7 @@ const PoliceDashboard = () => {
         } catch (error) {
             console.error("Failed to fetch patrol status", error);
         }
-    }; */
+    };
 
     const fetchAllReports = async () => {
         setLoading(true);
@@ -168,7 +168,7 @@ const PoliceDashboard = () => {
         }
     };
 
-    /* const togglePatrol = async (checked) => {
+    const togglePatrol = async (checked) => {
         try {
             const res = await axiosInstance.put('/auth/patrol', { isPatrol: checked });
             if (res.data.success) {
@@ -183,7 +183,7 @@ const PoliceDashboard = () => {
             console.error(error);
             message.error('Failed to update patrol status');
         }
-    }; */
+    };
 
     const handleRowClick = (record) => {
         setSelectedReport(record);
@@ -386,7 +386,7 @@ const PoliceDashboard = () => {
                                     />
                                 </Card>
                             </Col>
-                            {/* <Col xs={24} sm={8}>
+                            <Col xs={24} sm={8}>
                                 <Card variant="borderless" className="glass-card" styles={{ body: { display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' } }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                                         <Statistic
@@ -408,7 +408,7 @@ const PoliceDashboard = () => {
                                         />
                                     </div>
                                 </Card>
-                            </Col> */}
+                            </Col>
                         </Row>
 
                         <div style={{ marginTop: '40px' }}>
@@ -480,7 +480,7 @@ const PoliceDashboard = () => {
                         />
                     </div>
                 );
-            /* case '3':
+            case '3':
                 return (
                     <div className="glass-panel">
                         <Title level={2}>Vehicle Lookup</Title>
@@ -528,7 +528,7 @@ const PoliceDashboard = () => {
                             </div>
                         )}
                     </div>
-                ); */
+                );
             default:
                 return null;
         }
@@ -549,7 +549,7 @@ const PoliceDashboard = () => {
                     items={[
                         { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
                         { key: '2', icon: <FileTextOutlined />, label: 'Assignments' },
-                        // { key: '3', icon: <HistoryOutlined />, label: 'Vehicle Lookup' },
+                        { key: '3', icon: <HistoryOutlined />, label: 'Vehicle Lookup' },
                     ]}
                 />
             </Sider>
