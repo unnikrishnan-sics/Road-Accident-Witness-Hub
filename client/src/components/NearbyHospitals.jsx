@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, List, Button, Typography, Spin, Empty, App } from 'antd';
-import { EnvironmentOutlined, NavigationOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, CompassOutlined, PlusSquareOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -96,7 +96,7 @@ const NearbyHospitals = () => {
                             actions={[
                                 <Button
                                     type="primary"
-                                    icon={<NavigationOutlined />}
+                                    icon={<CompassOutlined />}
                                     onClick={() => handleNavigate(hosp.lat, hosp.lon)}
                                     size="small"
                                     shape="round"
