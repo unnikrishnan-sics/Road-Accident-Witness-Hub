@@ -15,6 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import AccidentMap from '../components/AccidentMap';
+import NearbyHospitals from '../components/NearbyHospitals';
 import { io } from 'socket.io-client';
 
 import { formatDisplayName } from '../utils/userUtils';
@@ -44,9 +45,9 @@ const ReporterDashboard = () => {
         });
 
         return () => socket.disconnect();
-    }, []);
+    }, [fetchMyReports]);
 
-    const fetchMyReports = async () => {
+    const fetchMyReports = React.useCallback(async () => {
         setLoading(true);
         try {
             const res = await axiosInstance.get('/reports/my-reports');
@@ -59,7 +60,7 @@ const ReporterDashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [message]);
 
     const handleLogout = () => {
         modal.confirm({
@@ -179,6 +180,20 @@ const ReporterDashboard = () => {
                                         prefix={<ClockCircleOutlined style={{ color: '#faad14' }} />}
                                         styles={{ content: { color: '#faad14' } }}
                                     />
+                                </Card>
+                            </Col>
+                        </Row>
+
+                        <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
+                            <Col xs={24} md={12}>
+                                <NearbyHospitals />
+                            </Col>
+                            <Col xs={24} md={12}>
+                                <Card className="glass-card" title={<span style={{ color: 'white' }}><SafetyCertificateOutlined style={{ color: '#1890ff', marginRight: '10px' }} /> Quick Safety Tip</span>}>
+                                    <Text style={{ color: 'rgba(255,255,255,0.8)', display: 'block', marginBottom: '10px' }}>
+                                        Always prioritize your safety first. Do not attempt to move victims unless you are trained.
+                                    </Text>
+                                    <Button type="link" style={{ padding: 0 }}>View First Aid Guide</Button>
                                 </Card>
                             </Col>
                         </Row>

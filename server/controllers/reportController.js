@@ -42,6 +42,26 @@ exports.createReport = async (req, res) => {
             });
         }
 
+        // Duplicate Check (Within 500m and 1 hour)
+        if (lat && lng) {
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+            const latRange = 0.0045; // ~500m
+            const lngRange = 0.0045; // ~500m (approximate at equator, slightly more elsewhere but sufficient)
+
+            const existingReport = await Report.findOne({
+                'coordinates.lat': { $gte: lat - latRange, $lte: lat + latRange },
+                'coordinates.lng': { $gte: lng - lngRange, $lte: lng + lngRange },
+                timestamp: { $gte: oneHourAgo }
+            });
+
+            if (existingReport) {
+                return res.status(409).json({
+                    success: false,
+                    error: 'A similar report has already been submitted for this location recently. Help is already on the way!'
+                });
+            }
+        }
+
         const report = await Report.create({
             location,
             description,
