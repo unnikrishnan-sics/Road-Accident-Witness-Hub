@@ -135,6 +135,17 @@ const AdminDashboard = () => {
             key: 'timestamp',
             render: (text) => new Date(text).toLocaleString(),
         },
+        {
+            title: 'Reports',
+            key: 'duplicates',
+            render: (_, record) => (
+                record.duplicateCount > 0 ? (
+                    <Tag color="purple">+{record.duplicateCount} More</Tag>
+                ) : (
+                    <Tag color="default">Single</Tag>
+                )
+            ),
+        }
     ];
 
     const renderContent = () => {
@@ -150,17 +161,17 @@ const AdminDashboard = () => {
                             <Col xs={24} sm={12} lg={6}>
                                 <div className="glass-card" style={{ textAlign: 'center' }}>
                                     <FileTextOutlined style={{ fontSize: '32px', color: '#f5222d', marginBottom: '10px' }} />
-                                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>{reports.length}</div>
-                                    <div style={{ color: 'rgba(255,255,255,0.7)' }}>Total Reports</div>
+                                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>{reports.filter(r => r.isPrimary).length}</div>
+                                    <div style={{ color: 'rgba(255,255,255,0.7)' }}>Unique Incidents</div>
                                 </div>
                             </Col>
                             <Col xs={24} sm={12} lg={6}>
                                 <div className="glass-card" style={{ textAlign: 'center' }}>
                                     <AlertOutlined style={{ fontSize: '32px', color: '#faad14', marginBottom: '10px' }} />
                                     <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>
-                                        {reports.filter(r => r.status === 'Pending').length}
+                                        {reports.filter(r => r.status === 'Pending' && r.isPrimary).length}
                                     </div>
-                                    <div style={{ color: 'rgba(255,255,255,0.7)' }}>Pending Verification</div>
+                                    <div style={{ color: 'rgba(255,255,255,0.7)' }}>Pending Alerts</div>
                                 </div>
                             </Col>
                             <Col xs={24} sm={12} lg={6}>
@@ -182,7 +193,7 @@ const AdminDashboard = () => {
                         <div style={{ marginTop: '40px' }}>
                             <Title level={4}>Recent Reports</Title>
                             <Table
-                                dataSource={reports.slice(0, 5)}
+                                dataSource={reports.filter(r => r.isPrimary).slice(0, 5)}
                                 columns={columns}
                                 rowKey="_id"
                                 pagination={false}
@@ -203,11 +214,42 @@ const AdminDashboard = () => {
                         </div>
 
                         <Table
-                            dataSource={reports}
+                            dataSource={reports.filter(r => r.isPrimary)}
                             columns={columns}
                             rowKey="_id"
                             loading={loading}
                             className="glass-table"
+                            expandable={{
+                                expandedRowRender: (record) => {
+                                    const duplicates = reports.filter(r =>
+                                        r._id !== record._id &&
+                                        r.coordinates && record.coordinates &&
+                                        Math.abs(r.coordinates.lat - record.coordinates.lat) <= 0.0045 &&
+                                        Math.abs(r.coordinates.lng - record.coordinates.lng) <= 0.0045 &&
+                                        Math.abs(new Date(r.timestamp) - new Date(record.timestamp)) <= 3600000
+                                    );
+
+                                    return (
+                                        <div style={{ padding: '0 50px' }}>
+                                            <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Related Witness Reports</Title>
+                                            <Table
+                                                columns={[
+                                                    { title: 'Witness ID', dataIndex: 'reporter', key: 'reporter', render: (id) => id.slice(-6) },
+                                                    { title: 'Time', dataIndex: 'timestamp', key: 'timestamp', render: (t) => new Date(t).toLocaleTimeString() },
+                                                    { title: 'Description', dataIndex: 'description', key: 'description' },
+                                                    { title: 'Vehicle', dataIndex: 'vehicleNo', key: 'vehicleNo' }
+                                                ]}
+                                                dataSource={duplicates}
+                                                rowKey="_id"
+                                                pagination={false}
+                                                size="small"
+                                                className="glass-table"
+                                            />
+                                        </div>
+                                    );
+                                },
+                                rowExpandable: (record) => record.duplicateCount > 0,
+                            }}
                         />
                     </div>
                 );

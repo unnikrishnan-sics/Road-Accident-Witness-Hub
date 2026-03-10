@@ -231,17 +231,38 @@ exports.getAllReports = async (req, res) => {
         const { vehicleNo } = req.query;
         let query = {};
 
-        // If vehicleNo is provided, filter by it (case-insensitive)
         if (vehicleNo) {
             query.vehicleNo = { $regex: vehicleNo, $options: 'i' };
         }
 
         const reports = await Report.find(query).sort({ timestamp: -1 });
 
+        // Identify duplicates/linked reports (Same location within 500m and 1 hour)
+        const latRange = 0.0045;
+        const lngRange = 0.0045;
+        const timeLimit = 60 * 60 * 1000;
+
+        const processedReports = reports.map(report => {
+            const potentialDuplicates = reports.filter(other =>
+                other._id.toString() !== report._id.toString() &&
+                other.coordinates && report.coordinates &&
+                Math.abs(other.coordinates.lat - report.coordinates.lat) <= latRange &&
+                Math.abs(other.coordinates.lng - report.coordinates.lng) <= lngRange &&
+                Math.abs(new Date(other.timestamp) - new Date(report.timestamp)) <= timeLimit
+            );
+
+            return {
+                ...report.toObject(),
+                duplicateCount: potentialDuplicates.length,
+                isPrimary: potentialDuplicates.length === 0 ||
+                    new Date(report.timestamp) <= Math.min(...potentialDuplicates.map(d => new Date(d.timestamp)))
+            };
+        });
+
         res.status(200).json({
             success: true,
-            count: reports.length,
-            data: reports
+            count: processedReports.length,
+            data: processedReports
         });
     } catch (error) {
         console.error(error);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Typography, Avatar, Dropdown, Row, Col, Card, Statistic, Table, Tag, Button, App, Modal, Switch, Input, Empty } from 'antd';
+import { Layout, Menu, Typography, Avatar, Dropdown, Row, Col, Card, Statistic, Table, Tag, Button, App, Modal, Switch, Input, Empty, List } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -250,12 +250,13 @@ const PoliceDashboard = () => {
 
     // Data filtering
     const today = new Date().toDateString();
-    const pendingReports = reports.filter(r => r.status === 'Pending');
-    const resolvedReports = reports.filter(r =>
+    const primaryReports = reports.filter(r => r.isPrimary);
+    const pendingReports = primaryReports.filter(r => r.status === 'Pending');
+    const resolvedReports = primaryReports.filter(r =>
         (r.status === 'Verified' || r.status === 'False') &&
         new Date(r.timestamp).toDateString() === today
     );
-    const assignments = reports;
+    const assignments = primaryReports;
 
     // Reusable Columns
     const getColumns = (showActions = false) => [
@@ -300,6 +301,17 @@ const PoliceDashboard = () => {
             dataIndex: 'vehicleNo',
             key: 'vehicleNo',
             render: (text) => <span style={{ color: '#fff', fontWeight: 'bold' }}>{text}</span>
+        },
+        {
+            title: 'Reports',
+            key: 'duplicates',
+            render: (_, record) => (
+                record.duplicateCount > 0 ? (
+                    <Tag color="purple">+{record.duplicateCount}</Tag>
+                ) : (
+                    <Tag color="default">1</Tag>
+                )
+            ),
         },
         {
             title: 'Status',
@@ -452,6 +464,34 @@ const PoliceDashboard = () => {
                                     rowKey="_id"
                                     pagination={false}
                                     className="glass-table"
+                                    expandable={{
+                                        expandedRowRender: (record) => {
+                                            const duplicates = reports.filter(r =>
+                                                r._id !== record._id &&
+                                                r.coordinates && record.coordinates &&
+                                                Math.abs(r.coordinates.lat - record.coordinates.lat) <= 0.0045 &&
+                                                Math.abs(r.coordinates.lng - record.coordinates.lng) <= 0.0045 &&
+                                                Math.abs(new Date(r.timestamp) - new Date(record.timestamp)) <= 3600000
+                                            );
+                                            return (
+                                                <div style={{ padding: '0 50px' }}>
+                                                    <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Related Witness Descriptions</Title>
+                                                    <List
+                                                        dataSource={duplicates}
+                                                        renderItem={item => (
+                                                            <List.Item style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                <List.Item.Meta
+                                                                    title={<Text style={{ color: 'white' }}>Witness {item.reporter.slice(-6)} - {new Date(item.timestamp).toLocaleTimeString()}</Text>}
+                                                                    description={<Text style={{ color: 'rgba(255,255,255,0.7)' }}>{item.description}</Text>}
+                                                                />
+                                                            </List.Item>
+                                                        )}
+                                                    />
+                                                </div>
+                                            );
+                                        },
+                                        rowExpandable: (record) => record.duplicateCount > 0,
+                                    }}
                                     onRow={(record) => ({
                                         onClick: () => handleRowClick(record),
                                         style: { cursor: 'pointer' }
@@ -473,6 +513,34 @@ const PoliceDashboard = () => {
                             columns={getColumns(true)}
                             rowKey="_id"
                             className="glass-table"
+                            expandable={{
+                                expandedRowRender: (record) => {
+                                    const duplicates = reports.filter(r =>
+                                        r._id !== record._id &&
+                                        r.coordinates && record.coordinates &&
+                                        Math.abs(r.coordinates.lat - record.coordinates.lat) <= 0.0045 &&
+                                        Math.abs(r.coordinates.lng - record.coordinates.lng) <= 0.0045 &&
+                                        Math.abs(new Date(r.timestamp) - new Date(record.timestamp)) <= 3600000
+                                    );
+                                    return (
+                                        <div style={{ padding: '0 50px' }}>
+                                            <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Other Witness Accounts</Title>
+                                            <List
+                                                dataSource={duplicates}
+                                                renderItem={item => (
+                                                    <List.Item style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                        <List.Item.Meta
+                                                            title={<Text style={{ color: 'white' }}>Witness {item.reporter.slice(-6)} - {new Date(item.timestamp).toLocaleTimeString()}</Text>}
+                                                            description={<Text style={{ color: 'rgba(255,255,255,0.7)' }}>{item.description}</Text>}
+                                                        />
+                                                    </List.Item>
+                                                )}
+                                            />
+                                        </div>
+                                    );
+                                },
+                                rowExpandable: (record) => record.duplicateCount > 0,
+                            }}
                             onRow={(record) => ({
                                 onClick: () => handleRowClick(record),
                                 style: { cursor: 'pointer' }

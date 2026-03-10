@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, List, Button, Typography, Spin, Empty, App } from 'antd';
-import { EnvironmentOutlined, CompassOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, CompassOutlined, PlusSquareOutlined, PhoneOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -22,8 +22,8 @@ const NearbyHospitals = () => {
                     const { latitude, longitude } = position.coords;
 
                     try {
-                        // Overpass API query for hospitals within 5km
-                        const query = `[out:json];node["amenity"="hospital"](around:5000,${latitude},${longitude});out;`;
+                        // Overpass API query for hospitals within 5km, including phone/emergency fields
+                        const query = `[out:json];node["amenity"="hospital"](around:10000,${latitude},${longitude});out;`;
                         const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
                         const data = await response.json();
 
@@ -33,6 +33,8 @@ const NearbyHospitals = () => {
                             return {
                                 id: h.id,
                                 name: h.tags.name || 'Unnamed Hospital',
+                                phone: h.tags.phone || h.tags['contact:phone'] || h.tags.emergency_phone || null,
+                                address: h.tags['addr:street'] ? `${h.tags['addr:street']} ${h.tags['addr:housenumber'] || ''}` : null,
                                 lat: h.lat,
                                 lon: h.lon,
                                 distance: dist.toFixed(1)
@@ -94,6 +96,18 @@ const NearbyHospitals = () => {
                     renderItem={(hosp) => (
                         <List.Item
                             actions={[
+                                hosp.phone && (
+                                    <Button
+                                        type="primary"
+                                        icon={<PhoneOutlined />}
+                                        href={`tel:${hosp.phone}`}
+                                        size="small"
+                                        shape="round"
+                                        style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                                    >
+                                        Call
+                                    </Button>
+                                ),
                                 <Button
                                     type="primary"
                                     icon={<CompassOutlined />}
@@ -104,12 +118,23 @@ const NearbyHospitals = () => {
                                     Navigate
                                 </Button>
                             ]}
-                            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '12px 0' }}
                         >
                             <List.Item.Meta
-                                avatar={<EnvironmentOutlined style={{ color: '#1890ff', fontSize: '20px' }} />}
+                                avatar={<EnvironmentOutlined style={{ color: '#1890ff', fontSize: '20px', marginTop: '4px' }} />}
                                 title={<Text strong style={{ color: 'white' }}>{hosp.name}</Text>}
-                                description={<Text type="secondary" style={{ color: 'rgba(255,255,255,0.5)' }}>{hosp.distance} km away</Text>}
+                                description={
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                        <Text type="secondary" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px' }}>
+                                            {hosp.distance} km away {hosp.address ? `• ${hosp.address}` : ''}
+                                        </Text>
+                                        {hosp.phone && (
+                                            <Text style={{ color: '#52c41a', fontSize: '12px' }}>
+                                                <PhoneOutlined style={{ fontSize: '10px' }} /> {hosp.phone}
+                                            </Text>
+                                        )}
+                                    </div>
+                                }
                             />
                         </List.Item>
                     )}
