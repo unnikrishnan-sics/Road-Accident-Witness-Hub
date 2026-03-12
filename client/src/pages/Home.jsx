@@ -3,11 +3,29 @@ import { Button, Row, Col, Typography, Card, Tag, Statistic } from 'antd';
 import { CameraOutlined, SafetyCertificateOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import HospitalMap from '../components/HospitalMap';
+import NearbyHospitals from '../components/NearbyHospitals';
+import axiosInstance from '../api/axiosInstance';
 
 const { Title, Paragraph, Text } = Typography;
 
 const Home = () => {
     const navigate = useNavigate();
+    const [reportCount, setReportCount] = React.useState(0);
+
+    React.useEffect(() => {
+        const fetchCount = async () => {
+            try {
+                const res = await axiosInstance.get('/reports/count');
+                if (res.data.success) {
+                    setReportCount(res.data.count);
+                }
+            } catch (err) {
+                console.error("Failed to fetch report count", err);
+            }
+        };
+        fetchCount();
+    }, []);
 
     return (
         <div className="home-container" style={{ overflow: 'hidden' }}>
@@ -112,9 +130,11 @@ const Home = () => {
                                 alignItems: 'center',
                                 gap: '10px'
                             }}
-                            onClick={() => navigate('/safety-map')}
+                            onClick={() => {
+                                document.getElementById('safety-hub').scrollIntoView({ behavior: 'smooth' });
+                            }}
                         >
-                            <SafetyCertificateOutlined style={{ color: '#1890ff' }} /> VIEW SAFETY MAP
+                            <SafetyCertificateOutlined style={{ color: '#1890ff' }} /> EXPLORE LIVE HUB
                         </Button>
                     </div>
                 </div>
@@ -125,13 +145,40 @@ const Home = () => {
                     padding: '20px 40px',
                     borderRadius: '24px',
                     display: 'flex',
-                    gap: '60px',
+                    justifyContent: 'center',
                     background: 'rgba(255,255,255,0.03)',
                     border: '1px solid rgba(255,255,255,0.05)'
                 }}>
-                    <Statistic title={<span style={{ color: 'rgba(255,255,255,0.5)' }}>AI Accuracy</span>} value={98} suffix="%" styles={{ content: { color: '#fff', fontWeight: '800' } }} />
-                    <Statistic title={<span style={{ color: 'rgba(255,255,255,0.5)' }}>Response Time</span>} value={2.4} suffix="m" styles={{ content: { color: '#fff', fontWeight: '800' } }} />
-                    <Statistic title={<span style={{ color: 'rgba(255,255,255,0.5)' }}>Reports Filed</span>} value={1420} styles={{ content: { color: '#fff', fontWeight: '800' } }} />
+                    <Statistic
+                        title={<span style={{ color: 'rgba(255,255,255,0.5)' }}>Total Reports Filed</span>}
+                        value={reportCount}
+                        styles={{ content: { color: '#fff', fontWeight: '800' } }}
+                    />
+                </div>
+            </section>
+
+            {/* Live Safety Hub Section */}
+            <section id="safety-hub" style={{ padding: '80px 20px', background: 'rgba(0,0,0,0.3)' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                    <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+                        <Title level={2} style={{ fontSize: '40px', fontWeight: '800', marginBottom: '16px' }}>
+                            Live <span style={{ color: '#1890ff' }}>Safety Hub</span>
+                        </Title>
+                        <Paragraph style={{ fontSize: '18px', color: 'rgba(255,255,255,0.5)' }}>
+                            Real-time tracking of medical facilities and active police presence in your area.
+                        </Paragraph>
+                    </div>
+
+                    <Row gutter={[32, 32]}>
+                        <Col xs={24} lg={16}>
+                            <Card className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
+                                <HospitalMap showPatrols={true} />
+                            </Card>
+                        </Col>
+                        <Col xs={24} lg={8}>
+                            <NearbyHospitals />
+                        </Col>
+                    </Row>
                 </div>
             </section>
 

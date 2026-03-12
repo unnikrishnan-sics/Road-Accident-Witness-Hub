@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const auth = require('../middleware/auth');
-const { createReport, getAllReports, analyzeImage, getMyReports, updateReportStatus } = require('../controllers/reportController');
+const { createReport, getAllReports, analyzeImage, getMyReports, updateReportStatus, getReportCount } = require('../controllers/reportController');
 
 // Configure Multer (Memory Storage for forwarding to AI)
 const storage = multer.memoryStorage();
@@ -14,5 +14,6 @@ router.post('/', auth, upload.single('image'), createReport);
 router.get('/my-reports', auth, getMyReports);
 router.get('/', getAllReports);
 router.put('/:id/status', auth, updateReportStatus);
+router.get('/count', getReportCount);
 
 module.exports = router;

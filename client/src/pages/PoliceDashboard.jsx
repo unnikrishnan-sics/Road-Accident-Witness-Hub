@@ -32,8 +32,7 @@ const PoliceDashboard = () => {
     const [selectedKey, setSelectedKey] = useState('1');
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
-    // const [isPatrol, setIsPatrol] = useState(false);
-    const isPatrol = false; // Force disabled
+    const [isPatrol, setIsPatrol] = useState(false);
 
     // Vehicle LookUp State
     const [vehicleSearch, setVehicleSearch] = useState('');
@@ -124,9 +123,14 @@ const PoliceDashboard = () => {
     }, []);
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
         fetchAllReports();
         fetchPatrolStatus();
-    }, []);
+    }, [navigate]);
 
     const fetchPatrolStatus = async () => {
         try {
@@ -254,7 +258,7 @@ const PoliceDashboard = () => {
     const pendingReports = primaryReports.filter(r => r.status === 'Pending');
     const resolvedReports = primaryReports.filter(r =>
         (r.status === 'Verified' || r.status === 'False') &&
-        new Date(r.timestamp).toDateString() === today
+        new Date(r.updatedAt || r.timestamp).toDateString() === today
     );
     const assignments = primaryReports;
 
@@ -476,17 +480,24 @@ const PoliceDashboard = () => {
                                             return (
                                                 <div style={{ padding: '0 50px' }}>
                                                     <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Related Witness Descriptions</Title>
-                                                    <List
-                                                        dataSource={duplicates}
-                                                        renderItem={item => (
-                                                            <List.Item style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                                                <List.Item.Meta
-                                                                    title={<Text style={{ color: 'white' }}>Witness {item.reporter.slice(-6)} - {new Date(item.timestamp).toLocaleTimeString()}</Text>}
-                                                                    description={<Text style={{ color: 'rgba(255,255,255,0.7)' }}>{item.description}</Text>}
-                                                                />
-                                                            </List.Item>
-                                                        )}
-                                                    />
+                                                    <div style={{ padding: '0 50px' }}>
+                                                        <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Related Witness Descriptions</Title>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                            {duplicates.map((item, idx) => (
+                                                                <div key={item._id} style={{
+                                                                    padding: '12px 0',
+                                                                    borderBottom: idx !== duplicates.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
+                                                                }}>
+                                                                    <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>
+                                                                        Witness {item.reporter.slice(-6)} - {new Date(item.timestamp).toLocaleTimeString()}
+                                                                    </div>
+                                                                    <div style={{ color: 'rgba(255,255,255,0.7)' }}>
+                                                                        {item.description}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             );
                                         },
@@ -525,17 +536,24 @@ const PoliceDashboard = () => {
                                     return (
                                         <div style={{ padding: '0 50px' }}>
                                             <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Other Witness Accounts</Title>
-                                            <List
-                                                dataSource={duplicates}
-                                                renderItem={item => (
-                                                    <List.Item style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                                        <List.Item.Meta
-                                                            title={<Text style={{ color: 'white' }}>Witness {item.reporter.slice(-6)} - {new Date(item.timestamp).toLocaleTimeString()}</Text>}
-                                                            description={<Text style={{ color: 'rgba(255,255,255,0.7)' }}>{item.description}</Text>}
-                                                        />
-                                                    </List.Item>
-                                                )}
-                                            />
+                                            <div style={{ padding: '0 50px' }}>
+                                                <Title level={5} style={{ color: 'white', marginBottom: '15px' }}>Other Witness Accounts</Title>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                    {duplicates.map((item, idx) => (
+                                                        <div key={item._id} style={{
+                                                            padding: '12px 0',
+                                                            borderBottom: idx !== duplicates.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
+                                                        }}>
+                                                            <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>
+                                                                Witness {item.reporter.slice(-6)} - {new Date(item.timestamp).toLocaleTimeString()}
+                                                            </div>
+                                                            <div style={{ color: 'rgba(255,255,255,0.7)' }}>
+                                                                {item.description}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     );
                                 },
@@ -570,31 +588,37 @@ const PoliceDashboard = () => {
                             </div>
                         </Card>
 
-                        {hasSearched && (
-                            <div className="fade-in">
-                                <Title level={4} style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    Search Results {vehicleHistory.length > 0 && <Tag color="geekblue" style={{ fontSize: '14px', paddingTop: '4px' }}>{vehicleHistory.length} Records Found</Tag>}
-                                </Title>
+                        {/* Improved Results Section: Show all by default if no search, or filtered results */}
+                        <div className="fade-in">
+                            <Title level={4} style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                {vehicleSearch ? `Records for "${vehicleSearch}"` : 'Recent Incident History'}
+                                {(vehicleSearch ? vehicleHistory.length : primaryReports.length) > 0 &&
+                                    <Tag color="geekblue" style={{ fontSize: '14px', paddingTop: '4px' }}>
+                                        {vehicleSearch ? vehicleHistory.length : primaryReports.length} Records
+                                    </Tag>
+                                }
+                            </Title>
 
-                                {vehicleHistory.length > 0 ? (
-                                    <Table
-                                        dataSource={vehicleHistory}
-                                        columns={getColumns(false)}
-                                        rowKey="_id"
-                                        className="glass-table"
-                                        onRow={(record) => ({
-                                            onClick: () => handleRowClick(record),
-                                            style: { cursor: 'pointer' }
-                                        })}
-                                    />
-                                ) : (
-                                    <Empty
-                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                        description={<span style={{ color: 'rgba(255,255,255,0.5)' }}>No accident records found for this vehicle.</span>}
-                                    />
-                                )}
-                            </div>
-                        )}
+                            {(vehicleSearch ? vehicleHistory : primaryReports).length > 0 ? (
+                                <Table
+                                    dataSource={vehicleSearch ? vehicleHistory : primaryReports}
+                                    columns={getColumns(false)}
+                                    rowKey="_id"
+                                    className="glass-table"
+                                    onRow={(record) => ({
+                                        onClick: () => handleRowClick(record),
+                                        style: { cursor: 'pointer' }
+                                    })}
+                                />
+                            ) : (
+                                <Empty
+                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                    description={<span style={{ color: 'rgba(255,255,255,0.5)' }}>
+                                        {vehicleSearch ? 'No accident records found for this vehicle.' : 'No incident history available.'}
+                                    </span>}
+                                />
+                            )}
+                        </div>
                     </div>
                 );
             default:

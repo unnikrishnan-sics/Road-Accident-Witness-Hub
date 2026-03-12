@@ -44,6 +44,7 @@ const Navbar = () => {
             <div className="nav-links" style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
                 {[
                     { name: 'Home', path: '/' },
+                    { name: 'First Aid', path: '/first-aid' },
                     // { name: 'Safety Map', path: '/safety-map' },
                     { name: 'About', path: '/about' },
                     { name: 'Contact', path: '/contact' },
@@ -57,7 +58,9 @@ const Navbar = () => {
                             position: 'relative',
                             color: isActive(link.path) ? '#fff' : 'rgba(255,255,255,0.6)',
                             fontWeight: isActive(link.path) ? '700' : '400',
-                            transition: 'all 0.3s'
+                            transition: 'all 0.3s',
+                            display: 'inline-block',
+                            padding: '10px 0'
                         }}
                     >
                         {link.name}

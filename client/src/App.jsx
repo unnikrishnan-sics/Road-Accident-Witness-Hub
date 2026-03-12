@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import PoliceDashboard from './pages/PoliceDashboard';
 import ReporterDashboard from './pages/ReporterDashboard';
 import SafetyMap from './pages/SafetyMap';
+import FirstAidGuide from './pages/FirstAidGuide';
 import { ConfigProvider, App as AntdApp } from 'antd';
 
 // Protected Route Component
@@ -84,6 +85,7 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/report" element={<ReportAccident />} />
                         <Route path="/safety-map" element={<SafetyMap />} />
+                        <Route path="/first-aid" element={<FirstAidGuide />} />
 
                         {/* Protected Routes */}
                         <Route
@@ -104,6 +106,22 @@ function App() {
                         />
                         <Route
                             path="/reporter/dashboard/*"
+                            element={
+                                <ProtectedRoute>
+                                    <ReporterDashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reporter/my-reports"
+                            element={
+                                <ProtectedRoute>
+                                    <ReporterDashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/reporter/profile"
                             element={
                                 <ProtectedRoute>
                                     <ReporterDashboard />

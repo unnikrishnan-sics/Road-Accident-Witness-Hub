@@ -23,6 +23,21 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+// Response Interceptor to handle Globals (like 401)
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default axiosInstance;
 
 // Example of how to use the specific AI timeout (this part is illustrative and not added to the axiosInstance config directly)

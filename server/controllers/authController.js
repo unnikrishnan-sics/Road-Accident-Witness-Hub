@@ -13,6 +13,7 @@ const generateToken = (id) => {
 
 exports.registerUser = async (req, res) => {
     const { email, password, name } = req.body;
+    console.log(`[Register] Request received for: ${email}, Name: ${name}`);
 
     try {
         const userExists = await User.findOne({ email });
@@ -37,10 +38,12 @@ exports.registerUser = async (req, res) => {
                 token: generateToken(user._id),
             });
         } else {
+            console.error('[Register] Failed to create user document');
             res.status(400).json({ message: 'Invalid user data' });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('[Register] Error Exception:', error);
+        res.status(400).json({ message: error.message });
     }
 };
 
@@ -116,7 +119,7 @@ exports.updatePatrolStatus = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
-        console.error('[updatePatrolStatus] Error:', error);
-        res.status(500).json({ message: error.message });
+        console.error('[updatePatrolStatus] UNHANDLED ERROR:', error);
+        res.status(500).json({ message: error.message, stack: error.stack });
     }
 };

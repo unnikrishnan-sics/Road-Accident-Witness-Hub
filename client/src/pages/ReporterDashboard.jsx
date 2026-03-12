@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Dropdown, Row, Col, Table, Tag, Card, Statistic, Button, Typography, Avatar, App } from 'antd';
+import { Layout, Menu, Dropdown, Row, Col, Table, Tag, Card, Statistic, Button, Typography, Avatar, App, Space } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -12,10 +12,10 @@ import {
     SafetyCertificateOutlined,
     EnvironmentOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import AccidentMap from '../components/AccidentMap';
+import HospitalMap from '../components/HospitalMap';
 import NearbyHospitals from '../components/NearbyHospitals';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
 import { formatDisplayName } from '../utils/userUtils';
@@ -25,17 +25,60 @@ const { Title, Text } = Typography;
 const ReporterDashboard = () => {
     const { message, modal } = App.useApp();
     const [collapsed, setCollapsed] = useState(false);
-    const [selectedKey, setSelectedKey] = useState('1');
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Map URL to selectedKey
+    const getSelectedKey = (path) => {
+        if (path === '/reporter/my-reports') return '/reporter/my-reports';
+        if (path === '/reporter/profile') return '/reporter/profile';
+        return '/reporter/dashboard';
+    };
+
+    const [selectedKey, setSelectedKey] = useState(getSelectedKey(location.pathname));
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
     const [reports, setReports] = useState([]);
     const [policePatrols, setPolicePatrols] = useState([]);
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+
+    useEffect(() => {
+        setSelectedKey(getSelectedKey(location.pathname));
+    }, [location.pathname]);
 
     // Get user from local storage
     const user = JSON.parse(localStorage.getItem('user')) || { email: 'Reporter' };
 
+    const fetchMyReports = React.useCallback(async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        setLoading(true);
+        try {
+            const res = await axiosInstance.get('/reports/my-reports');
+            if (res.data.success) {
+                setReports(res.data.data);
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+            } else {
+                message.error('Failed to fetch your reports');
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [message]);
+
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
         fetchMyReports();
 
         // Socket for live patrols
@@ -45,22 +88,7 @@ const ReporterDashboard = () => {
         });
 
         return () => socket.disconnect();
-    }, [fetchMyReports]);
-
-    const fetchMyReports = React.useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await axiosInstance.get('/reports/my-reports');
-            if (res.data.success) {
-                setReports(res.data.data);
-            }
-        } catch (error) {
-            console.error(error);
-            message.error('Failed to fetch your reports');
-        } finally {
-            setLoading(false);
-        }
-    }, [message]);
+    }, [fetchMyReports, navigate]);
 
     const handleLogout = () => {
         modal.confirm({
@@ -144,7 +172,7 @@ const ReporterDashboard = () => {
 
     const renderContent = () => {
         switch (selectedKey) {
-            case '1':
+            case '/reporter/dashboard':
                 // Dashboard Overview
                 return (
                     <div className="glass-panel">
@@ -193,7 +221,24 @@ const ReporterDashboard = () => {
                                     <Text style={{ color: 'rgba(255,255,255,0.8)', display: 'block', marginBottom: '10px' }}>
                                         Always prioritize your safety first. Do not attempt to move victims unless you are trained.
                                     </Text>
-                                    <Button type="link" style={{ padding: 0 }}>View First Aid Guide</Button>
+                                    <Button
+                                        type="primary"
+                                        icon={<FileTextOutlined />}
+                                        onClick={() => navigate('/first-aid')}
+                                        style={{
+                                            marginTop: '8px',
+                                            borderRadius: '8px',
+                                            padding: '0 20px',
+                                            height: '42px',
+                                            background: 'rgba(24, 144, 255, 0.15)',
+                                            borderColor: '#1890ff',
+                                            color: '#1890ff',
+                                            fontWeight: '600'
+                                        }}
+                                        className="glass-btn"
+                                    >
+                                        View First Aid Guide
+                                    </Button>
                                 </Card>
                             </Col>
                         </Row>
@@ -202,7 +247,7 @@ const ReporterDashboard = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                                 <Title level={4}>Recent Activity</Title>
                                 <div style={{ display: 'flex', gap: '12px' }}>
-                                    <Button.Group style={{ background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '10px' }}>
+                                    <Space.Compact style={{ background: 'rgba(255,255,255,0.05)', padding: '4px', borderRadius: '10px' }}>
                                         <Button
                                             type={viewMode === 'list' ? 'primary' : 'text'}
                                             icon={<FileTextOutlined />}
@@ -219,7 +264,7 @@ const ReporterDashboard = () => {
                                         >
                                             Map
                                         </Button>
-                                    </Button.Group>
+                                    </Space.Compact>
                                     <Button
                                         type="primary"
                                         size="large"
@@ -241,13 +286,13 @@ const ReporterDashboard = () => {
                                 />
                             ) : (
                                 <div className="glass-panel" style={{ padding: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <AccidentMap reports={reports} policePatrols={policePatrols} />
+                                    <HospitalMap />
                                 </div>
                             )}
                         </div>
                     </div>
                 );
-            case '2':
+            case '/reporter/my-reports':
                 // All Reports
                 return (
                     <div className="glass-panel">
@@ -263,7 +308,7 @@ const ReporterDashboard = () => {
                         />
                     </div>
                 );
-            case '3':
+            case '/reporter/profile':
                 // Profile
                 return (
                     <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px' }}>
@@ -305,12 +350,12 @@ const ReporterDashboard = () => {
                     theme="dark"
                     mode="inline"
                     selectedKeys={[selectedKey]}
-                    onClick={(e) => setSelectedKey(e.key)}
+                    onClick={(e) => navigate(e.key)}
                     style={{ background: 'transparent' }}
                     items={[
-                        { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
-                        { key: '2', icon: <FileTextOutlined />, label: 'My Reports' },
-                        { key: '3', icon: <UserOutlined />, label: 'My Profile' }
+                        { key: '/reporter/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+                        { key: '/reporter/my-reports', icon: <FileTextOutlined />, label: 'My Reports' },
+                        { key: '/reporter/profile', icon: <UserOutlined />, label: 'My Profile' }
                     ]}
                 />
             </Layout.Sider>

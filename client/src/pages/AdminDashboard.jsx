@@ -11,6 +11,8 @@ import {
     AlertOutlined,
     CheckCircleOutlined,
     ClockCircleOutlined,
+    SearchOutlined,
+    HistoryOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { formatDisplayName } from '../utils/userUtils';
@@ -23,9 +25,15 @@ const { Title, Text } = Typography;
 const AdminDashboard = () => {
     const { modal, message } = App.useApp();
     const [collapsed, setCollapsed] = useState(false);
-    const [selectedKey, setSelectedKey] = useState('1');
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // Vehicle LookUp State
+    const [vehicleSearch, setVehicleSearch] = useState('');
+    const [vehicleHistory, setVehicleHistory] = useState([]);
+    const [searchingVehicle, setSearchingVehicle] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
+
     const navigate = useNavigate();
 
     // User is guaranteed to be admin here
@@ -33,8 +41,13 @@ const AdminDashboard = () => {
     const displayRole = 'Administrator';
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+            return;
+        }
         fetchReports();
-    }, []);
+    }, [navigate]);
 
     const fetchReports = async () => {
         setLoading(true);
@@ -66,6 +79,23 @@ const AdminDashboard = () => {
         });
     };
 
+    const handleVehicleSearch = async () => {
+        if (!vehicleSearch.trim()) return;
+        setSearchingVehicle(true);
+        setHasSearched(true);
+        try {
+            const res = await axiosInstance.get(`/reports?vehicleNo=${vehicleSearch}`);
+            if (res.data.success) {
+                setVehicleHistory(res.data.data);
+            }
+        } catch (error) {
+            console.error(error);
+            message.error('Search failed');
+        } finally {
+            setSearchingVehicle(false);
+        }
+    };
+
     const userItems = [
         {
             key: 'logout',
@@ -88,7 +118,7 @@ const AdminDashboard = () => {
         },
         {
             key: '3',
-            icon: <CarOutlined />,
+            icon: <HistoryOutlined />,
             label: 'Vehicle History',
         },
     ];
@@ -255,12 +285,64 @@ const AdminDashboard = () => {
                 );
             case '3':
                 return (
-                    <div className="glass-panel" style={{ textAlign: 'center', padding: '100px 20px' }}>
-                        <CarOutlined style={{ fontSize: '64px', color: '#f5222d', marginBottom: '20px' }} />
-                        <Title level={2}>Vehicle History</Title>
-                        <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.7)' }}>This feature is under development.</p>
-                        <div style={{ marginTop: '20px', padding: '10px 20px', background: 'rgba(245, 34, 45, 0.1)', display: 'inline-block', borderRadius: '8px', color: '#f5222d', fontWeight: 'bold' }}>
-                            COMING SOON
+                    <div className="glass-panel">
+                        <Title level={2}>Vehicle History Search</Title>
+                        <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.7)', marginBottom: '30px' }}>Search accident history by Vehicle Registration Number.</p>
+
+                        <div className="glass-card" style={{ maxWidth: '600px', marginBottom: '40px', padding: '24px' }}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <Input
+                                    size="large"
+                                    placeholder="Enter Vehicle No (e.g. KL01AZ1234)"
+                                    prefix={<CarOutlined style={{ color: 'rgba(255,255,255,0.3)' }} />}
+                                    value={vehicleSearch}
+                                    onChange={(e) => setVehicleSearch(e.target.value.toUpperCase())}
+                                    onPressEnter={handleVehicleSearch}
+                                    style={{
+                                        background: 'rgba(0, 0, 0, 0.25)',
+                                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                                        color: 'white'
+                                    }}
+                                />
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    icon={<SearchOutlined />}
+                                    onClick={handleVehicleSearch}
+                                    loading={searchingVehicle}
+                                    style={{ background: '#f5222d', borderColor: '#f5222d' }}
+                                >
+                                    Search
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Show all reports by default if no search, or filtered results */}
+                        <div className="fade-in">
+                            <Title level={4} style={{ marginBottom: '20px', color: 'white' }}>
+                                {vehicleSearch ? `Records for "${vehicleSearch}"` : 'Cumulative Incident History'}
+                                {(vehicleSearch ? vehicleHistory.length : reports.filter(r => r.isPrimary).length) > 0 &&
+                                    <Tag color="error" style={{ marginLeft: '10px' }}>
+                                        {vehicleSearch ? vehicleHistory.length : reports.filter(r => r.isPrimary).length} INCIDENTS
+                                    </Tag>
+                                }
+                            </Title>
+
+                            {(vehicleSearch ? vehicleHistory : reports.filter(r => r.isPrimary)).length > 0 ? (
+                                <Table
+                                    dataSource={vehicleSearch ? vehicleHistory : reports.filter(r => r.isPrimary)}
+                                    columns={columns.filter(c => c.key !== 'duplicates')}
+                                    rowKey="_id"
+                                    className="glass-table"
+                                />
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '50px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                                    <CarOutlined style={{ fontSize: '48px', color: 'rgba(255,255,255,0.1)', marginBottom: '16px' }} />
+                                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '16px' }}>
+                                        {vehicleSearch ? 'No accident records found for this vehicle.' : 'No incident history found.'}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );

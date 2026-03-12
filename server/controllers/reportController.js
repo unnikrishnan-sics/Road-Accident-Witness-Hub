@@ -12,6 +12,8 @@ const path = require('path');
 exports.createReport = async (req, res) => {
     try {
         let { location, description, vehicleNo, severity, lat, lng } = req.body;
+        lat = Number(lat);
+        lng = Number(lng);
         let photoUrl = '';
 
         if (req.file) {
@@ -263,6 +265,24 @@ exports.getAllReports = async (req, res) => {
             success: true,
             count: processedReports.length,
             data: processedReports
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
+};
+// @desc    Get total report count
+// @route   GET /api/reports/count
+// @access  Public
+exports.getReportCount = async (req, res) => {
+    try {
+        const count = await Report.countDocuments();
+        res.status(200).json({
+            success: true,
+            count
         });
     } catch (error) {
         console.error(error);
