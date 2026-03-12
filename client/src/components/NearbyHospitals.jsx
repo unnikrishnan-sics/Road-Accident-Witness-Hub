@@ -47,6 +47,15 @@ const NearbyHospitals = () => {
                             out center;
                         `;
                         const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+
+                        if (!response.ok) {
+                            if (response.status === 429) {
+                                message.warning('Hospital search is temporarily rate-limited. Please try again in active a few moments.');
+                                throw new Error('Rate limit exceeded');
+                            }
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
                         const data = await response.json();
 
                         // Calculate distances

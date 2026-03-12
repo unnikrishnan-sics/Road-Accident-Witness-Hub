@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, App } from 'antd';
+import { Layout, Menu, Button, Typography, Avatar, Dropdown, Row, Col, Table, Tag, App, Input } from 'antd';
 import {
     DashboardOutlined,
     FileTextOutlined,
@@ -27,6 +27,7 @@ const AdminDashboard = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [selectedKey, setSelectedKey] = useState('1');
 
     // Vehicle LookUp State
     const [vehicleSearch, setVehicleSearch] = useState('');

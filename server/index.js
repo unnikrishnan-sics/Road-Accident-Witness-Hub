@@ -100,8 +100,8 @@ mongoose
 
         // Seed Admin, and Police
         const seeds = [
-            { email: 'admin@gmail.com', password: 'admin@123', role: 'admin' },
-            { email: 'police@gmail.com', password: 'police@123', role: 'police' }
+            { email: 'admin@gmail.com', password: 'admin@123', role: 'admin', name: 'System Admin' },
+            { email: 'police@gmail.com', password: 'police@123', role: 'police', name: 'Officer John' }
         ];
 
         try {
@@ -111,11 +111,20 @@ mongoose
                     await User.create(seed);
                     console.log(`Seeded: ${seed.email}`);
                 } else {
-                    // Update role if it doesn't match
+                    // Update role or name if it doesn't match/is missing
+                    let updated = false;
                     if (user.role !== seed.role) {
                         user.role = seed.role;
+                        updated = true;
+                    }
+                    if (!user.name) {
+                        user.name = seed.name;
+                        updated = true;
+                    }
+
+                    if (updated) {
                         await user.save();
-                        console.log(`Updated role for: ${seed.email} to ${seed.role}`);
+                        console.log(`Updated details for: ${seed.email}`);
                     } else {
                         console.log(`Exists (Verified): ${seed.email}`);
                     }

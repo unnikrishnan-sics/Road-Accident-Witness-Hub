@@ -70,6 +70,15 @@ const HospitalMap = ({ showPatrols = false }) => {
                     out center;
                 `;
                 const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+
+                if (!response.ok) {
+                    if (response.status === 429) {
+                        console.warn('Overpass API rate limit reached (429).');
+                        // Optional: You could set an error state here to show a message to the user
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
 
                 const processed = data.elements.map(h => {

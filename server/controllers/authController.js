@@ -101,25 +101,40 @@ exports.getMe = async (req, res) => {
 exports.updatePatrolStatus = async (req, res) => {
     try {
         const { isPatrol } = req.body;
-        console.log(`[updatePatrolStatus] Request Body:`, req.body);
-        console.log(`[updatePatrolStatus] User ID: ${req.user.id}, New Status: ${isPatrol}`);
+        console.log(`[updatePatrolStatus] START - Request Body:`, JSON.stringify(req.body));
+        console.log(`[updatePatrolStatus] User ID from Token: ${req.user.id}`);
+
+        if (typeof isPatrol === 'undefined') {
+            console.error('[updatePatrolStatus] isPatrol is undefined in request body');
+            return res.status(400).json({ message: 'isPatrol is required' });
+        }
 
         const user = await User.findById(req.user.id);
 
         if (user) {
+            console.log(`[updatePatrolStatus] Found User: ${user.email}, Current isPatrol: ${user.isPatrol}`);
             user.isPatrol = isPatrol;
+
+            console.log(`[updatePatrolStatus] Attempting to save user with new status: ${isPatrol}`);
             const updatedUser = await user.save();
-            console.log(`[updatePatrolStatus] Saved: ${updatedUser.isPatrol}`);
+            console.log(`[updatePatrolStatus] SUCCESS - Saved: ${updatedUser.isPatrol}`);
 
             res.json({
                 success: true,
                 isPatrol: updatedUser.isPatrol
             });
         } else {
+            console.error(`[updatePatrolStatus] User with ID ${req.user.id} not found in DB`);
             res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
-        console.error('[updatePatrolStatus] UNHANDLED ERROR:', error);
-        res.status(500).json({ message: error.message, stack: error.stack });
+        console.error('[updatePatrolStatus] ERROR CAUGHT:', error);
+        console.error('[updatePatrolStatus] ERROR MESSAGE:', error.message);
+        console.error('[updatePatrolStatus] ERROR STACK:', error.stack);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
